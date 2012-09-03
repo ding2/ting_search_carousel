@@ -5,21 +5,17 @@
  */
 
 /**
+ * Implements hook_init().
+ */
+function ting_search_carousel_init() {
+  theme('ting_search_carousel_javascript');
+}
+
+/**
  * Implements hook_menu().
  */
 function ting_search_carousel_menu() {
   $items = array();
-
-  $items['admin/config/ting/ting_search_carousel'] = array(
-    'title' => 'Ting search carousel',
-    'description' => 'Manage frontpage carousel',
-    'page callback' => 'ting_search_carousel_admin_page',
-    'page arguments' => array(),
-    'access arguments' => array('access administration pages'),
-    'file' => 'ting_search_carousel.admin.inc',
-    'weight' => 30,
-    'position' => 'left',
-  );
 
   $items['ting_search_carousel/results/ajax'] = array(
     'title' => 'Show search carousel results',
@@ -27,6 +23,33 @@ function ting_search_carousel_menu() {
     'access arguments' => array('access content'),
     'file' => 'ting_search_carousel.pages.inc',
     'type' => MENU_CALLBACK,
+  );
+  
+  $items['admin/config/ting/ting_search_carousel'] = array(
+    'title' => 'Ting search carousel',
+    'description' => 'Manage content for frontpage carousel.',
+  	'page callback' => 'ting_search_carousel_admin_page',
+    'page arguments' => array(),
+    'access arguments' => array('access administration pages'),
+    'file' => 'ting_search_carousel.admin.inc',
+  );
+
+  $items['admin/config/ting/ting_search_carousel/settings'] = array(
+    'title' => 'Content',
+    'description' => 'Manage content for frontpage carousel.',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );  
+  
+  $items['admin/config/ting/ting_search_carousel/frontend_settings'] = array(
+    'title' => 'Frontend settings',
+    'description' => 'Manage settings for the display of frontpage carousel',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ting_search_carousel_settings_admin_form'),
+    'access arguments' => array('access administration pages'),
+    'file' => 'ting_search_carousel.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 0,
   );
 
   return $items;
@@ -39,7 +62,7 @@ function ting_search_carousel_block_info() {
   $blocks = array();
 
   $blocks['ting_search_carousel'] = array(
-    'info' => 'Ting search carousel'
+    'info' => 'Ting search carousel, block'
   );
 
   return $blocks;
@@ -54,7 +77,8 @@ function ting_search_carousel_block_view($delta) {
   switch ($delta) {
     case 'ting_search_carousel':
       $searches = variable_get('ting_carousel_search_queries', array());
-      $block['content'] = theme('ting_search_carousel', array('searches' => $searches));
+      $tab_position = variable_get('ting_search_carousel_tabs_position');
+      $block['content'] = theme('ting_search_carousel', array('searches' => $searches, 'tab_position' => $tab_position));
       break;
   }
 
@@ -66,8 +90,14 @@ function ting_search_carousel_block_view($delta) {
  */
 function ting_search_carousel_theme($existing, $type, $theme, $path) {
   $hooks = array();
+  
+  $hooks['ting_search_carousel_javascript'] = array();
+  
   $hooks['ting_search_carousel'] = array(
-    'variables' => array('searches' => NULL),
+    'variables' => array(
+      'searches' => NULL,
+      'tab_position' => NULL,
+    ),
     'template' => 'ting_search_carousel'
   );
 
@@ -200,12 +230,30 @@ function ting_search_carousel_do_request($full = FALSE) {
  * Implements hook_image_default_styles().
  */
 function ting_search_carousel_image_default_styles() {
+    
   $styles = array();
-
+ 
   $styles['ting_search_carousel'] = array(
     'name' => 'ting_search_carousel',
     'effects' => array(
       0 => array(
+        'label' => 'Scale and crop',
+	/*'help' => '',*/
+	'effect callback' => 'image_scale_and_crop_effect',
+	'dimensions callback' => 'image_scale_dimensions',
+	/*'form callback' => 'image_scale_form',
+	  'summary theme' => 'image_scale_summary',*/
+	'module' => 'image',
+	'name' => 'image_scale_and_crop',
+	'data' => array(
+	  'width' => '90',
+	  'height' => '130',
+	),
+	'weight' => '1',
+      ),
+      /* TODO: Keeping the original for now, we should decide if we need an
+       * option to choose between scale and scale and crop.
+      1 => array(
         'label' => 'Scale',
         'help' => 'Scaling will maintain the aspect-ratio of the original image. If only a single dimension is specified, the other dimension will be calculated.',
         'effect callback' => 'image_scale_effect',
@@ -215,15 +263,29 @@ function ting_search_carousel_image_default_styles() {
         'module' => 'image',
         'name' => 'image_scale',
         'data' => array(
-          'width' => '',
-          'height' => '140',
-          'upscale' => 0,
+          'width' => '90',
+          'height' => '130',
+          'upscale' => 1,
         ),
         'weight' => '1',
       ),
+      */
     ),
   );
-
+  
   return $styles;
+}
+
+/**
+ * Theme function that just makes sure our JavaScript file
+ * gets included.
+ */
+function theme_ting_search_carousel_javascript() {
+  $path = drupal_get_path('module', 'ting_search_carousel');
+
+  drupal_add_library('system', 'ui.widget');
+  drupal_add_js($path . '/scripts/jquery.rs.carousel.js');
+  drupal_add_js($path . '/scripts/ting_search_carousel.js');
+  drupal_add_css($path . '/css/ting_search_carousel.css');
 }
 
