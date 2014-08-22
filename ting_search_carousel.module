@@ -112,6 +112,7 @@ function ting_search_carousel_do_request($index) {
   // Get query based in the index parameter.
   $queries = variable_get('ting_carousel_search_queries', array());
   $query = isset($queries[$index]) ? $queries[$index] : FALSE;
+  $sort = variable_get('ting_search_carousel_item_sorting', '');
 
   // If a query is defined, do a look-up else do nothing.
   if ($query) {
@@ -122,7 +123,13 @@ function ting_search_carousel_do_request($index) {
     $result = NULL;
     $page = 1;
     $collections = array();
-    while ($result = ting_do_search($query['query'], $page++, 50, array('facets' => array(), 'enrich' => TRUE, 'allObjects' => FALSE))) {
+    $ting_search_options = array(
+      'facets' => array(),
+      'enrich' => TRUE,
+      'allObjects' => FALSE,
+      'sort' => $sort
+    );
+    while ($result = ting_do_search($query['query'], $page++, 50, $ting_search_options)) {
       $collections[] = $result;
 
       if (!$result->more) {
