@@ -302,6 +302,7 @@ function _ting_search_carousel_add_javascript() {
   drupal_add_js($path . '/js/jquery.ui.touch-punch.min.js');
   drupal_add_js($path . '/js/jquery.rs.carousel.js');
   drupal_add_js($path . '/js/ting_search_carousel.js');
+  drupal_add_js(drupal_get_path('module', 'ting_search') . '/js/ting_search_overlay.js');
 }
 
 /**
