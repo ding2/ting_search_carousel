@@ -138,6 +138,24 @@ function ting_search_carousel_admin_form($form, &$form_state) {
     '#value' => $searches_num,
   );
 
+  $form['ting_search_carousel']['ting_search_carousel_item_sorting'] = array(
+    '#type' => 'select',
+    '#title' => t('Sorting'),
+    '#options' => array(
+      '' => t('- None -'),
+      'title_ascending' => t('Title (Ascending)'),
+      'title_descending' => t('Title (Descending)'),
+      'creator_ascending' => t('Creator (Ascending)'),
+      'creator_descending' => t('Creator (Descending)'),
+      'date_ascending' => t('Date (Ascending)'),
+      'date_descending' => t('Date (Descending)'),
+      'acquisitionDate_ascending' => t('Acquisition date (Ascending)'),
+      'acquisitionDate_descending' => t('Acquisition date (Descending)'),
+    ),
+    '#default_value' => variable_get('ting_search_carousel_item_sorting', ''),
+    '#description' => t('If not set, defaults to Ranking'),
+  );
+
   // Ajaxified button for new fields.
   $form['ting_search_carousel']['new_search_carousel_button'] = array(
     '#type' => 'button',
