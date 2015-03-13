@@ -40,6 +40,14 @@ function ting_search_carousel_settings_admin_form($form, &$form_state) {
     '#description' => t('Select where you want the tabs for displaying the various searches to be placed in frontend.'),
   );
 
+  $form['ting_search_carousel_settings']['ting_search_carousel_item_limit'] = array(
+    '#type' => 'select',
+    '#title' => t('Item limit'),
+    '#options' => array_combine(range(6, 24, 6), range(6, 24, 6)),
+    '#description' => t('The number of items to be returned in search result.'),
+    '#default_value' => variable_get('ting_search_carousel_item_limit', 50),
+  );
+
   $form['ting_search_carousel_settings']['ting_search_carousel_description_toggle'] = array(
     '#title' => t('Show descriptions for navigational tabs'),
     '#type' => 'checkbox',
