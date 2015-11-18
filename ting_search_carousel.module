@@ -177,6 +177,9 @@ function ting_search_carousel_do_request($index) {
   $covers = $service->getByFaustNumber($local_ids);
 
   // Loop over the fetched covers and build items.
+  $limit = variable_get('ting_search_carousel_item_limit', 6);
+  $obj_counter = 0;
+
   foreach ($covers as $local_id => $cover) {
     // Build cover filename.
     $filename = 'public://ting_search_carousel/' . md5($local_id) . '.jpg';
@@ -205,6 +208,11 @@ function ting_search_carousel_do_request($index) {
     $item->image = image_style_url('ting_search_carousel', $filename);
 
     $items[] = $item;
+
+    $obj_counter++;
+    if ($obj_counter == $limit) {
+      break;
+    }
   }
 
   // Update the cache with the fetched items.
